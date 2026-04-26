@@ -176,7 +176,8 @@ export const useCalculatorStore = defineStore("calculator", {
         return;
       }
 
-      const result = this.calculate(this.previousValue, currentValue, this.operator);
+      const activeOperator = this.operator;
+      const result = this.calculate(this.previousValue, currentValue, activeOperator);
       if (result === null) {
         this.displayValue = "0";
         this.previousValue = null;
@@ -189,7 +190,7 @@ export const useCalculatorStore = defineStore("calculator", {
       }
 
       this.displayValue = this.formatResult(result);
-      this.lastOperator = this.operator;
+      this.lastOperator = activeOperator;
       this.lastOperand = currentValue;
       this.previousValue = null;
       this.operator = null;
