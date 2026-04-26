@@ -43,6 +43,23 @@ export const useCalculatorStore = defineStore("calculator", {
       this.displayValue = `${this.displayValue}.`;
       this.error = null;
     },
+    backspace() {
+      if (this.waitingForOperand) {
+        return;
+      }
+
+      if (this.displayValue.length === 1) {
+        this.displayValue = "0";
+        return;
+      }
+
+      if (this.displayValue.length === 2 && this.displayValue.startsWith("-")) {
+        this.displayValue = "0";
+        return;
+      }
+
+      this.displayValue = this.displayValue.slice(0, -1);
+    },
     clear() {
       this.displayValue = initialState.displayValue;
       this.previousValue = initialState.previousValue;

@@ -87,7 +87,7 @@ flowchart TD
 ## Milestone Acceptance Checks
 - Milestone 1: completed - app launches with clean calculator UI and no template greet logic.
 - Milestone 2: completed - basic operations (`+`, `-`, `*`, `/`, `=`, `C`) work from buttons.
-- Milestone 3: keyboard input works and display updates predictably.
+- Milestone 3: completed - keyboard input works and display updates predictably.
 - Milestone 4: divide-by-zero and invalid sequences are handled safely.
 - Milestone 5 (optional): Rust command is called successfully from Vue.
 - Milestone 6: app bundles successfully for desktop.
