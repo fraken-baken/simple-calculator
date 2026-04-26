@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: optional-rust-bridge
     content: Add optional Rust command integration after TS logic is stable
-    status: pending
+    status: completed
   - id: docs-and-package
     content: Update README and verify build/bundle workflow
     status: pending
@@ -89,5 +89,5 @@ flowchart TD
 - Milestone 2: completed - basic operations (`+`, `-`, `*`, `/`, `=`, `C`) work from buttons.
 - Milestone 3: completed - keyboard input works and display updates predictably.
 - Milestone 4: completed - divide-by-zero, repeated equals, and long-input edge cases are handled safely.
-- Milestone 5 (optional): Rust command is called successfully from Vue.
+- Milestone 5 (optional): completed - Rust calculator command is called from Vue via optional bridge toggle.
 - Milestone 6: app bundles successfully for desktop.

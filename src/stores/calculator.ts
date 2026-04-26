@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { calculateBinaryInRust } from "../services/calculatorBridge";
 import type { CalculatorOperator, CalculatorState } from "../types/calculator";
 
 const MAX_DISPLAY_LENGTH = 16;
@@ -196,6 +197,73 @@ export const useCalculatorStore = defineStore("calculator", {
       this.operator = null;
       this.waitingForOperand = true;
       this.error = null;
+    },
+    async calculateResultWithRust() {
+      if (
+        this.operator === null &&
+        this.lastOperator !== null &&
+        this.lastOperand !== null
+      ) {
+        const currentValue = Number(this.displayValue);
+        try {
+          const result = await calculateBinaryInRust(
+            currentValue,
+            this.lastOperand,
+            this.lastOperator,
+          );
+
+          this.displayValue = this.formatResult(result);
+          this.waitingForOperand = true;
+          this.error = null;
+        } catch (error) {
+          this.handleRustError(error);
+        }
+        return;
+      }
+
+      if (this.operator === null || this.previousValue === null) {
+        return;
+      }
+
+      const currentValue = Number(this.displayValue);
+      if (Number.isNaN(currentValue)) {
+        this.error = "Invalid number";
+        return;
+      }
+
+      const activeOperator = this.operator;
+      try {
+        const result = await calculateBinaryInRust(
+          this.previousValue,
+          currentValue,
+          activeOperator,
+        );
+
+        this.displayValue = this.formatResult(result);
+        this.lastOperator = activeOperator;
+        this.lastOperand = currentValue;
+        this.previousValue = null;
+        this.operator = null;
+        this.waitingForOperand = true;
+        this.error = null;
+      } catch (error) {
+        this.handleRustError(error);
+      }
+    },
+    handleRustError(error: unknown) {
+      const message = String(error);
+      if (message.includes("Cannot divide by zero")) {
+        this.displayValue = "0";
+        this.previousValue = null;
+        this.operator = null;
+        this.lastOperator = null;
+        this.lastOperand = null;
+        this.waitingForOperand = false;
+        this.error = "Cannot divide by zero";
+        return;
+      }
+
+      this.error = "Rust bridge unavailable";
     },
     formatResult(value: number): string {
       if (!Number.isFinite(value)) {

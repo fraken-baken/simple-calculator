@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import type { CalculatorOperator } from "./types/calculator";
 import CalculatorButton from "./components/CalculatorButton.vue";
 import CalculatorDisplay from "./components/CalculatorDisplay.vue";
@@ -11,6 +11,7 @@ const displayValue = computed(() =>
   calculator.error ?? calculator.displayValue,
 );
 const hasError = computed(() => calculator.error !== null);
+const useRustBridge = ref(false);
 
 function handleDigit(digit: string) {
   calculator.inputDigit(digit);
@@ -18,6 +19,15 @@ function handleDigit(digit: string) {
 
 function handleOperator(operator: CalculatorOperator) {
   calculator.setOperator(operator);
+}
+
+async function handleEquals() {
+  if (useRustBridge.value) {
+    await calculator.calculateResultWithRust();
+    return;
+  }
+
+  calculator.calculateResult();
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -35,7 +45,7 @@ function handleKeydown(event: KeyboardEvent) {
 
   if (key === "Enter" || key === "=") {
     event.preventDefault();
-    calculator.calculateResult();
+    void handleEquals();
     return;
   }
 
@@ -67,6 +77,10 @@ onBeforeUnmount(() => {
   <main class="page">
     <section class="calculator" aria-label="Simple calculator">
       <CalculatorDisplay :value="displayValue" :is-error="hasError" />
+      <label class="bridge-toggle">
+        <input v-model="useRustBridge" type="checkbox" />
+        Use Rust bridge for =
+      </label>
 
       <div class="keys" role="group" aria-label="Calculator keys">
         <CalculatorButton
@@ -138,7 +152,7 @@ onBeforeUnmount(() => {
         <CalculatorButton
           variant="operator"
           aria-label="Equals"
-          @click="calculator.calculateResult"
+          @click="handleEquals"
         >
           =
         </CalculatorButton>
@@ -167,6 +181,15 @@ onBeforeUnmount(() => {
 
 .calculator :deep(.display-wrap) {
   margin-bottom: 0.9rem;
+}
+
+.bridge-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d1d5db;
+  font-size: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 .keys {
