@@ -2,13 +2,16 @@
 defineProps<{
   label?: string;
   value: string;
+  isError?: boolean;
 }>();
 </script>
 
 <template>
   <header class="display-wrap">
     <p class="label">{{ label ?? "Simple Calculator" }}</p>
-    <output class="display" aria-live="polite">{{ value }}</output>
+    <output class="display" :class="{ 'display--error': isError }" aria-live="polite">
+      {{ value }}
+    </output>
   </header>
 </template>
 
@@ -35,5 +38,10 @@ defineProps<{
   font-size: 2rem;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
+}
+
+.display--error {
+  color: #f87171;
+  font-size: 1.4rem;
 }
 </style>

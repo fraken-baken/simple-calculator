@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: add-keyboard-and-edges
     content: Implement keyboard support and edge-case handling
-    status: pending
+    status: completed
   - id: optional-rust-bridge
     content: Add optional Rust command integration after TS logic is stable
     status: pending
@@ -88,6 +88,6 @@ flowchart TD
 - Milestone 1: completed - app launches with clean calculator UI and no template greet logic.
 - Milestone 2: completed - basic operations (`+`, `-`, `*`, `/`, `=`, `C`) work from buttons.
 - Milestone 3: completed - keyboard input works and display updates predictably.
-- Milestone 4: divide-by-zero and invalid sequences are handled safely.
+- Milestone 4: completed - divide-by-zero, repeated equals, and long-input edge cases are handled safely.
 - Milestone 5 (optional): Rust command is called successfully from Vue.
 - Milestone 6: app bundles successfully for desktop.

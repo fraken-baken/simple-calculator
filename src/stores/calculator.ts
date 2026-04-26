@@ -1,10 +1,14 @@
 import { defineStore } from "pinia";
 import type { CalculatorOperator, CalculatorState } from "../types/calculator";
 
+const MAX_DISPLAY_LENGTH = 16;
+
 const initialState: CalculatorState = {
   displayValue: "0",
   previousValue: null,
   operator: null,
+  lastOperator: null,
+  lastOperand: null,
   waitingForOperand: false,
   error: null,
 };
@@ -17,10 +21,18 @@ export const useCalculatorStore = defineStore("calculator", {
         return;
       }
 
+      if (this.error) {
+        this.clear();
+      }
+
       if (this.waitingForOperand) {
         this.displayValue = digit;
         this.waitingForOperand = false;
         this.error = null;
+        return;
+      }
+
+      if (this.displayValue.length >= MAX_DISPLAY_LENGTH) {
         return;
       }
 
@@ -29,6 +41,10 @@ export const useCalculatorStore = defineStore("calculator", {
       this.error = null;
     },
     inputDecimal() {
+      if (this.error) {
+        this.clear();
+      }
+
       if (this.waitingForOperand) {
         this.displayValue = "0.";
         this.waitingForOperand = false;
@@ -40,11 +56,15 @@ export const useCalculatorStore = defineStore("calculator", {
         return;
       }
 
+      if (this.displayValue.length >= MAX_DISPLAY_LENGTH) {
+        return;
+      }
+
       this.displayValue = `${this.displayValue}.`;
       this.error = null;
     },
     backspace() {
-      if (this.waitingForOperand) {
+      if (this.error || this.waitingForOperand) {
         return;
       }
 
@@ -64,6 +84,8 @@ export const useCalculatorStore = defineStore("calculator", {
       this.displayValue = initialState.displayValue;
       this.previousValue = initialState.previousValue;
       this.operator = initialState.operator;
+      this.lastOperator = initialState.lastOperator;
+      this.lastOperand = initialState.lastOperand;
       this.waitingForOperand = initialState.waitingForOperand;
       this.error = initialState.error;
     },
@@ -82,7 +104,7 @@ export const useCalculatorStore = defineStore("calculator", {
         return;
       }
 
-      this.displayValue = String(currentValue / 100);
+      this.displayValue = this.formatResult(currentValue / 100);
       this.waitingForOperand = false;
       this.error = null;
     },
@@ -99,22 +121,51 @@ export const useCalculatorStore = defineStore("calculator", {
           this.displayValue = "0";
           this.previousValue = null;
           this.operator = null;
+          this.lastOperator = null;
+          this.lastOperand = null;
           this.waitingForOperand = false;
           this.error = "Cannot divide by zero";
           return;
         }
 
-        this.displayValue = String(result);
+        this.displayValue = this.formatResult(result);
         this.previousValue = result;
       } else {
         this.previousValue = currentValue;
       }
 
       this.operator = nextOperator;
+      this.lastOperator = null;
+      this.lastOperand = null;
       this.waitingForOperand = true;
       this.error = null;
     },
     calculateResult() {
+      if (
+        this.operator === null &&
+        this.lastOperator !== null &&
+        this.lastOperand !== null
+      ) {
+        const currentValue = Number(this.displayValue);
+        const result = this.calculate(currentValue, this.lastOperand, this.lastOperator);
+
+        if (result === null) {
+          this.displayValue = "0";
+          this.previousValue = null;
+          this.operator = null;
+          this.lastOperator = null;
+          this.lastOperand = null;
+          this.waitingForOperand = false;
+          this.error = "Cannot divide by zero";
+          return;
+        }
+
+        this.displayValue = this.formatResult(result);
+        this.waitingForOperand = true;
+        this.error = null;
+        return;
+      }
+
       if (this.operator === null || this.previousValue === null) {
         return;
       }
@@ -130,16 +181,33 @@ export const useCalculatorStore = defineStore("calculator", {
         this.displayValue = "0";
         this.previousValue = null;
         this.operator = null;
+        this.lastOperator = null;
+        this.lastOperand = null;
         this.waitingForOperand = false;
         this.error = "Cannot divide by zero";
         return;
       }
 
-      this.displayValue = String(result);
+      this.displayValue = this.formatResult(result);
+      this.lastOperator = this.operator;
+      this.lastOperand = currentValue;
       this.previousValue = null;
       this.operator = null;
       this.waitingForOperand = true;
       this.error = null;
+    },
+    formatResult(value: number): string {
+      if (!Number.isFinite(value)) {
+        return "0";
+      }
+
+      const normalized = Number(value.toPrecision(12));
+      const asPlain = String(normalized);
+      if (asPlain.length <= MAX_DISPLAY_LENGTH) {
+        return asPlain;
+      }
+
+      return normalized.toExponential(8);
     },
     calculate(
       left: number,

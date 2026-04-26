@@ -10,6 +10,7 @@ const calculator = useCalculatorStore();
 const displayValue = computed(() =>
   calculator.error ?? calculator.displayValue,
 );
+const hasError = computed(() => calculator.error !== null);
 
 function handleDigit(digit: string) {
   calculator.inputDigit(digit);
@@ -65,7 +66,7 @@ onBeforeUnmount(() => {
 <template>
   <main class="page">
     <section class="calculator" aria-label="Simple calculator">
-      <CalculatorDisplay :value="displayValue" />
+      <CalculatorDisplay :value="displayValue" :is-error="hasError" />
 
       <div class="keys" role="group" aria-label="Calculator keys">
         <CalculatorButton
@@ -172,5 +173,16 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.55rem;
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding: 0.75rem;
+  }
+
+  .calculator {
+    width: 100%;
+    border-radius: 12px;
+  }
 }
 </style>
