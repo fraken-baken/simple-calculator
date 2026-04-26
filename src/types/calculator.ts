@@ -1,4 +1,4 @@
-export type CalculatorOperator = "+" | "-" | "*" | "/" | "=";
+export type CalculatorOperator = "+" | "-" | "*" | "/";
 
 export interface CalculatorState {
   displayValue: string;

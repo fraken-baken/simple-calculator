@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: implement-store
     content: Create calculator Pinia store with full state and pure actions
-    status: pending
+    status: completed
   - id: build-ui
     content: Replace template UI with calculator layout and connect to store
     status: completed
@@ -86,7 +86,7 @@ flowchart TD
 
 ## Milestone Acceptance Checks
 - Milestone 1: completed - app launches with clean calculator UI and no template greet logic.
-- Milestone 2: all basic operations (`+`, `-`, `*`, `/`, `=`, `C`) work from buttons.
+- Milestone 2: completed - basic operations (`+`, `-`, `*`, `/`, `=`, `C`) work from buttons.
 - Milestone 3: keyboard input works and display updates predictably.
 - Milestone 4: divide-by-zero and invalid sequences are handled safely.
 - Milestone 5 (optional): Rust command is called successfully from Vue.

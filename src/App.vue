@@ -1,36 +1,58 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import CalculatorDisplay from "./components/CalculatorDisplay.vue";
+import { useCalculatorStore } from "./stores/calculator";
+
+const calculator = useCalculatorStore();
+
+const displayValue = computed(() =>
+  calculator.error ?? calculator.displayValue,
+);
+
+function handleDigit(digit: string) {
+  calculator.inputDigit(digit);
+}
 </script>
 
 <template>
   <main class="page">
     <section class="calculator" aria-label="Simple calculator">
-      <CalculatorDisplay value="0" />
+      <CalculatorDisplay :value="displayValue" />
 
       <div class="keys" role="group" aria-label="Calculator keys">
-        <button class="key key--function">C</button>
-        <button class="key key--function">+/-</button>
-        <button class="key key--function">%</button>
-        <button class="key key--operator">/</button>
+        <button class="key key--function" @click="calculator.clear">C</button>
+        <button class="key key--function" @click="calculator.toggleSign">+/-</button>
+        <button class="key key--function" @click="calculator.percent">%</button>
+        <button class="key key--operator" @click="calculator.setOperator('/')">
+          /
+        </button>
 
-        <button class="key">7</button>
-        <button class="key">8</button>
-        <button class="key">9</button>
-        <button class="key key--operator">*</button>
+        <button class="key" @click="handleDigit('7')">7</button>
+        <button class="key" @click="handleDigit('8')">8</button>
+        <button class="key" @click="handleDigit('9')">9</button>
+        <button class="key key--operator" @click="calculator.setOperator('*')">
+          *
+        </button>
 
-        <button class="key">4</button>
-        <button class="key">5</button>
-        <button class="key">6</button>
-        <button class="key key--operator">-</button>
+        <button class="key" @click="handleDigit('4')">4</button>
+        <button class="key" @click="handleDigit('5')">5</button>
+        <button class="key" @click="handleDigit('6')">6</button>
+        <button class="key key--operator" @click="calculator.setOperator('-')">
+          -
+        </button>
 
-        <button class="key">1</button>
-        <button class="key">2</button>
-        <button class="key">3</button>
-        <button class="key key--operator">+</button>
+        <button class="key" @click="handleDigit('1')">1</button>
+        <button class="key" @click="handleDigit('2')">2</button>
+        <button class="key" @click="handleDigit('3')">3</button>
+        <button class="key key--operator" @click="calculator.setOperator('+')">
+          +
+        </button>
 
-        <button class="key key--double">0</button>
-        <button class="key">.</button>
-        <button class="key key--operator">=</button>
+        <button class="key key--double" @click="handleDigit('0')">0</button>
+        <button class="key" @click="calculator.inputDecimal">.</button>
+        <button class="key key--operator" @click="calculator.calculateResult">
+          =
+        </button>
       </div>
     </section>
   </main>
@@ -71,7 +93,7 @@ import CalculatorDisplay from "./components/CalculatorDisplay.vue";
   background: #374151;
   color: #f9fafb;
   font-size: 1.1rem;
-  cursor: default;
+  cursor: pointer;
 }
 
 .key--function {
